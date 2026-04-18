@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, ShoppingCart, Users, Package,
   PhoneCall, Truck, DollarSign, UserCog,
-  ChevronLeft, ChevronRight, BarChart3, Bell
+  ChevronLeft, ChevronRight, BarChart3, Bell, User
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import { cn } from '../../utils/cn';
@@ -17,6 +17,7 @@ const navItems = [
   { to: '/finance', icon: DollarSign, label: 'Finance', roles: ['admin', 'comptable', 'manager'] },
   { to: '/employes', icon: UserCog, label: 'Employés', roles: ['admin', 'manager'] },
   { to: '/rapports', icon: BarChart3, label: 'Rapports', roles: ['admin', 'manager', 'comptable'] },
+  { to: '/profile', icon: User, label: 'Mon profil', roles: ['admin', 'manager', 'agent', 'comptable'] },
 ];
 
 export function Sidebar() {
