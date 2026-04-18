@@ -18,6 +18,16 @@ export function Navbar() {
     navigate('/login');
   };
 
+  const handleProfile = () => {
+    setProfileOpen(false);
+    navigate('/profile');
+  };
+
+  const handleSettings = () => {
+    setProfileOpen(false);
+    navigate('/profile');
+  };
+
   const typeIcon: Record<string, string> = {
     commande: '🛒',
     stock: '📦',
@@ -123,10 +133,16 @@ export function Navbar() {
                 <p className="text-xs text-gray-500 capitalize">{currentUser?.role}</p>
               </div>
               <div className="py-1">
-                <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <button
+                  onClick={handleProfile}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
                   <User size={15} /> Mon profil
                 </button>
-                <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <button
+                  onClick={handleSettings}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
                   <Settings size={15} /> Paramètres
                 </button>
                 <div className="border-t border-gray-100 mt-1 pt-1">
