@@ -19,7 +19,7 @@ const STATUTS_APPEL: StatutAppel[] = [
 const SOURCES = ['Tous', 'Facebook Ads', 'Instagram Ads', 'TikTok Ads', 'Site Web', 'WhatsApp', 'Récurrent'];
 
 export function Commandes() {
-  const { commandes, users, updateCommandeStatut, updateCommandeAppel, assignerAgent } = useStore();
+  const { commandes, users, produits, updateCommandeStatut, updateCommandeAppel, assignerAgent, addCommande } = useStore();
   const [search, setSearch] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
   const [filterSource, setFilterSource] = useState('');
