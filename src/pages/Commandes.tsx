@@ -28,15 +28,15 @@ export function Commandes() {
   const [callStatut, setCallStatut] = useState<StatutAppel>('confirme');
   const [callNote, setCallNote] = useState('');
   const [newModal, setNewModal] = useState(false);
-const [newForm, setNewForm] = useState({
-  clientNom: '',
-  clientTelephone: '',
-  clientVille: '',
-  source: 'Facebook Ads',
-  notes: '',
-  fraisLivraison: 30,
-});
-const [newItems, setNewItems] = useState<{produitId: string; produitNom: string; quantite: number; prixUnitaire: number}[]>([]);
+  const [newForm, setNewForm] = useState({
+    clientNom: '',
+    clientTelephone: '',
+    clientVille: '',
+    source: 'Facebook Ads',
+    notes: '',
+    fraisLivraison: 30,
+  });
+  const [newItems, setNewItems] = useState<{produitId: string; produitNom: string; quantite: number; prixUnitaire: number}[]>([]);
 
   const agents = users.filter(u => ['agent', 'manager'].includes(u.role));
 
@@ -56,6 +56,32 @@ const [newItems, setNewItems] = useState<{produitId: string; produitNom: string;
     setCallModal(null);
     setCallNote('');
     setCallStatut('confirme');
+  };
+
+  const handleAddCommande = () => {
+    if (!newForm.clientNom || !newForm.clientTelephone || newItems.length === 0) return;
+    const sousTotal = newItems.reduce((acc, i) => acc + i.prixUnitaire * i.quantite, 0);
+    const commande: Commande = {
+      id: Date.now().toString(),
+      reference: `CMD-${Date.now().toString().slice(-6)}`,
+      clientId: Date.now().toString(),
+      clientNom: newForm.clientNom,
+      clientTelephone: newForm.clientTelephone,
+      clientVille: newForm.clientVille,
+      items: newItems.map((i, idx) => ({ id: idx.toString(), produitId: i.produitId, produitNom: i.produitNom, quantite: i.quantite, prixUnitaire: i.prixUnitaire, total: i.quantite * i.prixUnitaire })),
+      sousTotal,
+      fraisLivraison: Number(newForm.fraisLivraison),
+      total: sousTotal + Number(newForm.fraisLivraison),
+      statut: 'nouvelle',
+      statutAppel: 'non_appele',
+      source: newForm.source,
+      notes: newForm.notes,
+      dateCreation: new Date().toISOString(),
+    };
+    addCommande(commande);
+    setNewModal(false);
+    setNewForm({ clientNom: '', clientTelephone: '', clientVille: '', source: 'Facebook Ads', notes: '', fraisLivraison: 30 });
+    setNewItems([]);
   };
 
   const statutColors: Record<string, string> = {
@@ -78,11 +104,11 @@ const [newItems, setNewItems] = useState<{produitId: string; produitNom: string;
           <h1 className="text-2xl font-bold text-gray-900">Commandes</h1>
           <p className="text-gray-500 text-sm mt-0.5">{filtered.length} commande{filtered.length > 1 ? 's' : ''} · {commandes.length} total</p>
         </div>
-        <button 
-  onClick={() => setNewModal(true)}
-  className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm shadow-indigo-200">
-  <Plus size={16} /> Nouvelle commande
-</button>
+        <button
+          onClick={() => setNewModal(true)}
+          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm shadow-indigo-200">
+          <Plus size={16} /> Nouvelle commande
+        </button>
       </div>
 
       {/* Stats rapides */}
@@ -343,6 +369,116 @@ const [newItems, setNewItems] = useState<{produitId: string; produitNom: string;
               </button>
               <button onClick={handleCallSave} className="flex-1 py-2 text-sm bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium">
                 Enregistrer
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Nouvelle Commande Modal */}
+      {newModal && (
+        <Modal open={newModal} onClose={() => setNewModal(false)} title="Nouvelle commande" size="lg">
+          <div className="space-y-4">
+            {/* Infos client */}
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Nom client *</label>
+                <input value={newForm.clientNom} onChange={e => setNewForm(f => ({...f, clientNom: e.target.value}))}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  placeholder="Nom complet" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Téléphone *</label>
+                <input value={newForm.clientTelephone} onChange={e => setNewForm(f => ({...f, clientTelephone: e.target.value}))}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  placeholder="06XXXXXXXX" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Ville *</label>
+                <input value={newForm.clientVille} onChange={e => setNewForm(f => ({...f, clientVille: e.target.value}))}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  placeholder="Casablanca" />
+              </div>
+            </div>
+
+            {/* Source + Livraison */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Source</label>
+                <select value={newForm.source} onChange={e => setNewForm(f => ({...f, source: e.target.value}))}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                  {SOURCES.filter(s => s !== 'Tous').map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Frais livraison (DH)</label>
+                <input type="number" value={newForm.fraisLivraison} onChange={e => setNewForm(f => ({...f, fraisLivraison: Number(e.target.value)}))}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+              </div>
+            </div>
+
+            {/* Articles */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs font-medium text-gray-600">Articles *</label>
+                <button onClick={() => setNewItems(i => [...i, { produitId: produits[0]?.id || '', produitNom: produits[0]?.nom || '', quantite: 1, prixUnitaire: produits[0]?.prixVente || 0 }])}
+                  className="text-xs px-2 py-1 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100">
+                  + Ajouter article
+                </button>
+              </div>
+              <div className="space-y-2">
+                {newItems.map((item, idx) => (
+                  <div key={idx} className="grid grid-cols-4 gap-2 items-center">
+                    <select value={item.produitId}
+                      onChange={e => {
+                        const p = produits.find(p => p.id === e.target.value);
+                        setNewItems(items => items.map((it, i) => i === idx ? {...it, produitId: e.target.value, produitNom: p?.nom || '', prixUnitaire: p?.prixVente || 0} : it));
+                      }}
+                      className="col-span-2 px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none">
+                      {produits.map(p => <option key={p.id} value={p.id}>{p.nom}</option>)}
+                    </select>
+                    <input type="number" min={1} value={item.quantite}
+                      onChange={e => setNewItems(items => items.map((it, i) => i === idx ? {...it, quantite: Number(e.target.value)} : it))}
+                      className="px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none" placeholder="Qté" />
+                    <button onClick={() => setNewItems(items => items.filter((_, i) => i !== idx))}
+                      className="text-red-400 hover:text-red-600 text-xs px-2 py-1.5 border border-red-100 rounded-lg hover:bg-red-50">
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Total */}
+            {newItems.length > 0 && (
+              <div className="bg-indigo-50 rounded-xl p-3 text-sm">
+                <span className="text-gray-600">Sous-total: </span>
+                <span className="font-semibold">{newItems.reduce((a, i) => a + i.prixUnitaire * i.quantite, 0)} DH</span>
+                <span className="text-gray-400 mx-2">+</span>
+                <span className="text-gray-600">Livraison: </span>
+                <span className="font-semibold">{newForm.fraisLivraison} DH</span>
+                <span className="text-gray-400 mx-2">=</span>
+                <span className="font-bold text-indigo-600">{newItems.reduce((a, i) => a + i.prixUnitaire * i.quantite, 0) + Number(newForm.fraisLivraison)} DH</span>
+              </div>
+            )}
+
+            {/* Notes */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+              <textarea value={newForm.notes} onChange={e => setNewForm(f => ({...f, notes: e.target.value}))}
+                rows={2} placeholder="Notes optionnelles..."
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none" />
+            </div>
+
+            {/* Boutons */}
+            <div className="flex gap-3">
+              <button onClick={() => setNewModal(false)} className="flex-1 py-2 text-sm border border-gray-200 rounded-xl hover:bg-gray-50">
+                Annuler
+              </button>
+              <button onClick={handleAddCommande}
+                disabled={!newForm.clientNom || !newForm.clientTelephone || newItems.length === 0}
+                className="flex-1 py-2 text-sm bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                Créer la commande
               </button>
             </div>
           </div>
