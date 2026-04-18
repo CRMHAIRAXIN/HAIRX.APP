@@ -11,6 +11,7 @@ import { Livraisons } from './pages/Livraisons';
 import { Finance } from './pages/Finance';
 import { Employes } from './pages/Employes';
 import { Rapports } from './pages/Rapports';
+import { Profile } from './pages/Profile';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useStore();
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="finance" element={<Finance />} />
           <Route path="employes" element={<Employes />} />
           <Route path="rapports" element={<Rapports />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
 
         {/* Fallback */}
