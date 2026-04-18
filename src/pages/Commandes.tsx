@@ -78,9 +78,11 @@ const [newItems, setNewItems] = useState<{produitId: string; produitNom: string;
           <h1 className="text-2xl font-bold text-gray-900">Commandes</h1>
           <p className="text-gray-500 text-sm mt-0.5">{filtered.length} commande{filtered.length > 1 ? 's' : ''} · {commandes.length} total</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm shadow-indigo-200">
-          <Plus size={16} /> Nouvelle commande
-        </button>
+        <button 
+  onClick={() => setNewModal(true)}
+  className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm shadow-indigo-200">
+  <Plus size={16} /> Nouvelle commande
+</button>
       </div>
 
       {/* Stats rapides */}
