@@ -27,6 +27,16 @@ export function Commandes() {
   const [callModal, setCallModal] = useState<Commande | null>(null);
   const [callStatut, setCallStatut] = useState<StatutAppel>('confirme');
   const [callNote, setCallNote] = useState('');
+  const [newModal, setNewModal] = useState(false);
+const [newForm, setNewForm] = useState({
+  clientNom: '',
+  clientTelephone: '',
+  clientVille: '',
+  source: 'Facebook Ads',
+  notes: '',
+  fraisLivraison: 30,
+});
+const [newItems, setNewItems] = useState<{produitId: string; produitNom: string; quantite: number; prixUnitaire: number}[]>([]);
 
   const agents = users.filter(u => ['agent', 'manager'].includes(u.role));
 
