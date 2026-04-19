@@ -11,7 +11,7 @@ const LANGUES = [
 export function Profile() {
   const { currentUser, updateUser } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'profil' | 'securite' | 'preferences'>('profil');
+  const [activeTab, setActiveTab] = useState('profil');
   const [saved, setSaved] = useState(false);
 
   // Profil form
@@ -37,6 +37,11 @@ export function Profile() {
   const [notifStock, setNotifStock] = useState(true);
   const [notifAppels, setNotifAppels] = useState(false);
 
+  const showSaved = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
   const handleSaveProfil = () => {
     if (!currentUser) return;
     updateUser(currentUser.id, {
@@ -53,24 +58,36 @@ export function Profile() {
     if (!securiteForm.nouveauMdp) return setMdpError('Entrez un nouveau mot de passe.');
     if (securiteForm.nouveauMdp.length < 6) return setMdpError('Minimum 6 caractères.');
     if (securiteForm.nouveauMdp !== securiteForm.confirmMdp) return setMdpError('Les mots de passe ne correspondent pas.');
+    
+    if (currentUser) {
+       updateUser(currentUser.id, {
+         password: securiteForm.nouveauMdp 
+       });
+    }
+
     setSecuriteForm({ ancienMdp: '', nouveauMdp: '', confirmMdp: '' });
     showSaved();
   };
 
   const handleSavePreferences = () => {
+    if (currentUser) {
+        updateUser(currentUser.id, {
+          preferences: {
+            langue,
+            notifCommandes,
+            notifStock,
+            notifAppels
+          }
+        });
+     }
     showSaved();
-  };
-
-  const showSaved = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
   };
 
   const tabs = [
     { id: 'profil', label: 'Mon profil', icon: User },
     { id: 'securite', label: 'Sécurité', icon: Lock },
     { id: 'preferences', label: 'Préférences', icon: Bell },
-  ] as const;
+  ];
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
@@ -194,7 +211,7 @@ export function Profile() {
                   <div className="relative">
                     <input
                       type={field.show ? 'text' : 'password'}
-                      value={securiteForm[field.key as keyof typeof securiteForm]}
+                      value={securiteForm[field.key]}
                       onChange={e => setSecuriteForm(f => ({ ...f, [field.key]: e.target.value }))}
                       className="w-full px-3 py-2.5 pr-10 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-300"
                     />
