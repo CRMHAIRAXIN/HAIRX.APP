@@ -59,7 +59,7 @@ interface CRMStore {
 
   // Actions — Users
   addUser: (user: User) => void;
-  updateUser: (id: string, data: Partial<User>) => void;
+  updateUser: (id: string, data: Partial<User>) => Promise<void>; // <-- Zidna Promise hna
 }
 
 export const useStore = create<CRMStore>((set, get) => ({
@@ -174,8 +174,41 @@ export const useStore = create<CRMStore>((set, get) => ({
   addUser: (user) =>
     set(state => ({ users: [user, ...state.users] })),
 
-  updateUser: (id, data) =>
-    set(state => ({
-      users: state.users.map(u => u.id === id ? { ...u, ...data } : u)
-    })),
+  // <-- HNA L'MODIFICATION LI DRNA -->
+  updateUser: async (id, data) => {
+    try {
+      // /!\ Bdel 'http://localhost:5000' b le lien dyal l'API dyalek dbsah
+      const response = await fetch(`http://localhost:5000/api/users/${id}`, {
+        method: 'PUT', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur mn lbackend, matsauvegardach dakchi');
+      }
+
+      // Updati l'interface mn b3d mayjaweb l'backend
+      set(state => {
+        const updatedUsers = state.users.map(u => u.id === id ? { ...u, ...data } : u);
+        
+        // Updati hta l'utilisateur li mconnecti daba (currentUser)
+        const updatedCurrentUser = state.currentUser?.id === id 
+          ? { ...state.currentUser, ...data } 
+          : state.currentUser;
+
+        return { 
+          users: updatedUsers,
+          currentUser: updatedCurrentUser
+        };
+      });
+
+      console.log('Update daz mzyan f base de données!');
+      
+    } catch (error) {
+      console.error("Mochkil f l'update dyal l'user:", error);
+    }
+  },
 }));
